@@ -1,0 +1,73 @@
+{
+  "dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "environment": {
+    "python": "3.12.11",
+    "torch": "2.11.0+cu128",
+    "gpu": "NVIDIA L4"
+  },
+  "params": {
+    "total": 4595022,
+    "fp32_mb": 18.380088
+  },
+  "macs": {
+    "macs": 1529700000.0
+  },
+  "devices": {
+    "cuda": {
+      "per_dim": {
+        "16": {
+          "end_to_end": {
+            "median_ms": 4.658
+          }
+        },
+        "32": {
+          "end_to_end": {
+            "median_ms": 4.655
+          }
+        },
+        "64": {
+          "end_to_end": {
+            "median_ms": 4.654
+          }
+        },
+        "128": {
+          "end_to_end": {
+            "median_ms": 4.662
+          }
+        },
+        "256": {
+          "end_to_end": {
+            "median_ms": 4.658
+          }
+        },
+        "512": {
+          "end_to_end": {
+            "median_ms": 4.68
+          }
+        }
+      },
+      "energy": {
+        "energy_per_inference_mj": 3.5,
+        "avg_power_w": 46.9,
+        "idle_power_w": 46.1
+      },
+      "peak_memory_mb": 41.3
+    },
+    "cpu": {
+      "per_dim": {
+        "512": {
+          "end_to_end": {
+            "median_ms": 16.7
+          }
+        }
+      }
+    }
+  }
+}

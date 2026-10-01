@@ -1,0 +1,47 @@
+{
+  "dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "modes": {
+    "fp32": {
+      "per_dim": {
+        "16": {
+          "macro_auc": 0.9264
+        }
+      },
+      "size_mb": 18.6,
+      "latency_ms": 4.51,
+      "device": "cuda"
+    },
+    "fp16": {
+      "per_dim": {
+        "16": {
+          "macro_auc": 0.9264
+        }
+      },
+      "size_mb": 18.6,
+      "latency_ms": 4.56,
+      "device": "cuda",
+      "small_prefix_penalty": 6e-06
+    },
+    "dynamic": {
+      "per_dim": {
+        "16": {
+          "macro_auc": 0.9263
+        }
+      },
+      "size_mb": 15.7,
+      "latency_ms": 17.13,
+      "device": "cpu",
+      "small_prefix_penalty": -8e-05
+    },
+    "static": {
+      "error": "NotImplementedError: quantized::conv1d"
+    }
+  }
+}

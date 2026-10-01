@@ -1,0 +1,35 @@
+{
+  "run_name": "xresnet1d50_mrl_s0",
+  "seed": 0,
+  "dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "backbone": "xresnet1d50",
+  "head": "mrl",
+  "lead_subset": "12lead",
+  "norm_mode": "dataset",
+  "n_params": null,
+  "class_names": [
+    "CD",
+    "HYP",
+    "MI",
+    "NORM",
+    "STTC"
+  ],
+  "_fixture": "synthetic; see tests/fixtures/build_fixture.py",
+  "test": {
+    "16": {
+      "macro_auc": 0.9153,
+      "per_class_auc": {}
+    },
+    "512": {
+      "macro_auc": 0.9126,
+      "per_class_auc": {}
+    }
+  }
+}

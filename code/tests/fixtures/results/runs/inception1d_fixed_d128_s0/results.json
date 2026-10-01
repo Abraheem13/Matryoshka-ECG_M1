@@ -1,0 +1,26 @@
+{
+  "run_name": "inception1d_fixed_d128_s0",
+  "seed": 0,
+  "dims": [
+    128
+  ],
+  "backbone": "inception1d",
+  "head": "linear",
+  "lead_subset": "12lead",
+  "norm_mode": "dataset",
+  "n_params": 4196229,
+  "class_names": [
+    "CD",
+    "HYP",
+    "MI",
+    "NORM",
+    "STTC"
+  ],
+  "_fixture": "synthetic; see tests/fixtures/build_fixture.py",
+  "test": {
+    "128": {
+      "macro_auc": 0.9247,
+      "per_class_auc": {}
+    }
+  }
+}

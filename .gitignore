@@ -1,11 +1,21 @@
-.DS_Store
 __pycache__/
 *.pyc
+.pytest_cache/
+.DS_Store
 venv/
-data/processed/
-data/ptbxl_raw
-*.zip
-results/checkpoints/*.pt
-results/logs/
+.venv/
+
+# datasets and derived arrays are never committed
+/data/
+/code/data/
+
+# run outputs: published as a release asset, not tracked here
+code/results/*
+!code/results/.gitkeep
+
+# checkpoints and logs
+*.pt
+*.ckpt
 *.tfevents.*
-results/*.pkl
+*.pkl
+code/tests/fixtures/results/aggregate.json

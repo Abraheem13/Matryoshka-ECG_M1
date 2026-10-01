@@ -1,0 +1,51 @@
+{
+  "run_name": "xresnet1d101_mrl_s0",
+  "seed": 0,
+  "dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "backbone": "xresnet1d101",
+  "head": "mrl",
+  "lead_subset": "12lead",
+  "norm_mode": "dataset",
+  "n_params": 34071630,
+  "class_names": [
+    "CD",
+    "HYP",
+    "MI",
+    "NORM",
+    "STTC"
+  ],
+  "_fixture": "synthetic; see tests/fixtures/build_fixture.py",
+  "test": {
+    "16": {
+      "macro_auc": 0.9117435028842544,
+      "per_class_auc": {}
+    },
+    "32": {
+      "macro_auc": 0.9116556349186105,
+      "per_class_auc": {}
+    },
+    "64": {
+      "macro_auc": 0.9113849242404918,
+      "per_class_auc": {}
+    },
+    "128": {
+      "macro_auc": 0.9107020815280171,
+      "per_class_auc": {}
+    },
+    "256": {
+      "macro_auc": 0.9099899494936612,
+      "per_class_auc": {}
+    },
+    "512": {
+      "macro_auc": 0.9099435028842544,
+      "per_class_auc": {}
+    }
+  }
+}

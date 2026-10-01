@@ -1,0 +1,35 @@
+{
+  "run_name": "inception1d_mrle_s0",
+  "seed": 0,
+  "dims": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "backbone": "inception1d",
+  "head": "mrl-e",
+  "lead_subset": "12lead",
+  "norm_mode": "dataset",
+  "n_params": null,
+  "class_names": [
+    "CD",
+    "HYP",
+    "MI",
+    "NORM",
+    "STTC"
+  ],
+  "_fixture": "synthetic; see tests/fixtures/build_fixture.py",
+  "test": {
+    "16": {
+      "macro_auc": 0.9212,
+      "per_class_auc": {}
+    },
+    "512": {
+      "macro_auc": 0.919,
+      "per_class_auc": {}
+    }
+  }
+}

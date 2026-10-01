@@ -1,0 +1,22 @@
+{
+  "source": "PTB-XL metadata (ptbxl_database.csv, scp_statements.csv)",
+  "task": "superdiagnostic",
+  "n_records_raw": 21799,
+  "n_patients_raw": 18869,
+  "n_records_labelled": 21388,
+  "n_patients_labelled": 18617,
+  "splits": {
+    "train": 17084,
+    "val": 2146,
+    "test": 2158
+  },
+  "class_counts": {
+    "CD": 4898,
+    "HYP": 2649,
+    "MI": 5469,
+    "NORM": 9514,
+    "STTC": 5235
+  },
+  "multi_label_fraction": 0.24050869646530765,
+  "patient_overlap_between_splits": 0
+}

@@ -1,0 +1,63 @@
+{
+  "equivalence": {
+    "diff": 0.0013,
+    "ci_low": 0.0007,
+    "ci_high": 0.0019,
+    "p": 0.0,
+    "equivalent": true,
+    "margin": 0.01,
+    "dim_small": 16,
+    "dim_large": 512,
+    "seed": 0
+  },
+  "cross_backbone": {
+    "16": {
+      "diff": 0.0146,
+      "ci_low": 0.01,
+      "ci_high": 0.0192,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    },
+    "32": {
+      "diff": 0.0144,
+      "ci_low": 0.0099,
+      "ci_high": 0.019,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    },
+    "64": {
+      "diff": 0.0147,
+      "ci_low": 0.01,
+      "ci_high": 0.0193,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    },
+    "128": {
+      "diff": 0.0152,
+      "ci_low": 0.0105,
+      "ci_high": 0.0199,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    },
+    "256": {
+      "diff": 0.0157,
+      "ci_low": 0.011,
+      "ci_high": 0.0204,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    },
+    "512": {
+      "diff": 0.0151,
+      "ci_low": 0.0104,
+      "ci_high": 0.0197,
+      "p": 0.0,
+      "p_holm": 0.0,
+      "significant": true
+    }
+  }
+}

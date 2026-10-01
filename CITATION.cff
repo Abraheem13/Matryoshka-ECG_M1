@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the article below."
+title: "Nested Semantic Encoding for Bandwidth-Adaptive Mission-Critical Biosignal Telemetry in 6G Networks: code"
+type: software
+repository-code: "https://github.com/Abraheem13/Matryoshka-ECG_M1"
+authors:
+  - family-names: Rashid
+    given-names: Abraheem
+  - family-names: Iradat
+    given-names: Faisal
+  - family-names: Iqbal
+    given-names: Waseem
+  - family-names: Bangash
+    given-names: Yawar Abbas
+  - family-names: Kumail
+    given-names: Muhammad
+preferred-citation:
+  type: article
+  title: "Nested Semantic Encoding for Bandwidth-Adaptive Mission-Critical Biosignal Telemetry in 6G Networks"
+  journal: "IEEE Open Journal of the Communications Society"
+  year: 2026
+  authors:
+    - family-names: Rashid
+      given-names: Abraheem
+    - family-names: Iradat
+      given-names: Faisal
+    - family-names: Iqbal
+      given-names: Waseem
+    - family-names: Bangash
+      given-names: Yawar Abbas
+    - family-names: Kumail
+      given-names: Muhammad

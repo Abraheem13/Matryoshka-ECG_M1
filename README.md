@@ -1,130 +1,182 @@
-# Matryoshka ECG: Adaptive-Fidelity Arrhythmia Classification
+# Nested Semantic Encoding for Bandwidth-Adaptive Mission-Critical Biosignal Telemetry in 6G Networks
 
-> **Paper:** Matryoshka ECG: Adaptive-Fidelity Arrhythmia Classification for Wearable-to-Cloud Deployment  
-> **Target:** IEEE Journal of Biomedical and Health Informatics (J-BHI)
+Code, configurations and analysis for the article of the same name,
+submitted to the *IEEE Open Journal of the Communications Society*.
 
-## 3-Day Execution Plan
-
-### Day 1: Setup + Data Pipeline + MRL Implementation ← YOU ARE HERE
-```bash
-# Step 1: Run the setup script (creates env, downloads PTB-XL ~2.6GB)
-chmod +x setup_day1.sh
-./setup_day1.sh
-
-# Step 2: Activate environment
-source venv/bin/activate
-
-# Step 3: Preprocess PTB-XL (extract signals, compute labels, normalize)
-python scripts/preprocess_ptbxl.py
-
-# Step 4: Verify everything works (data + model forward pass)
-python scripts/verify_data.py
-
-# Step 5: Start training MRL model (runs overnight)
-python scripts/train_day1.py --config configs/mrl_resnet1d.yaml
-```
-
-### Day 2: Baseline Training + Cross-Dataset Evaluation
-```bash
-# Train fixed-dimension baselines (one model per dim)
-for DIM in 16 32 64 128 256 512; do
-    python scripts/train_day1.py --config configs/mrl_resnet1d.yaml \
-        --no-mrl --fixed-dim $DIM --run-name baseline_dim${DIM}
-done
-
-# Train MRL with Inception1D backbone
-python scripts/train_day1.py --config configs/mrl_resnet1d.yaml \
-    --backbone inception1d --run-name mrl_inception1d
-
-# SVD baseline (post-hoc compression of full-dim model)
-python scripts/svd_baseline.py  # Day 2 script
-
-# Cross-dataset evaluation on CPSC 2018
-python scripts/eval_cpsc2018.py  # Day 2 script
-```
-
-### Day 3: Results Analysis + Pareto Plots + Deployment Simulation
-```bash
-# Generate all figures for the paper
-python scripts/generate_figures.py
-
-# Compute FLOPs, latency, memory at each nesting dim
-python scripts/deployment_analysis.py
-
-# Generate LaTeX tables
-python scripts/generate_tables.py
-```
-
-## Project Structure
-
-```
-matryoshka-ecg/
-├── configs/
-│   └── mrl_resnet1d.yaml        # Experiment configuration
-├── data/
-│   ├── dataset.py                # PyTorch Dataset + DataModule
-│   ├── processed/                # Preprocessed .npy files (after step 3)
-│   ├── raw/                      # Downloaded PTB-XL (after step 1)
-│   └── ptbxl_raw -> ...          # Symlink to extracted data
-├── losses/
-│   └── matryoshka_loss.py        # MRL loss + Standard loss
-├── models/
-│   ├── xresnet1d.py              # XResNet1D + Inception1D backbones
-│   └── mrl_ecg_model.py          # Complete model (backbone + head)
-├── utils/
-│   └── metrics.py                # Evaluation metrics (AUC, F1, etc.)
-├── scripts/
-│   ├── preprocess_ptbxl.py       # Data preprocessing
-│   ├── verify_data.py            # Verification script
-│   └── train_day1.py             # Training script
-├── results/
-│   ├── checkpoints/              # Model checkpoints
-│   ├── figures/                  # Generated plots
-│   └── logs/                     # TensorBoard logs
-├── setup_day1.sh                 # One-click setup script
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
-```
-
-## Key Implementation Details
-
-### Matryoshka Representation Learning (MRL)
-
-The core innovation: a single model produces embeddings that are useful at **any prefix dimension**. The first 16 dimensions carry enough information for a smartwatch, the first 64 for a smartphone, and the full 512 for a clinical workstation.
-
-**Loss function:**
-```
-L_total = (1/|M|) * Σ_{m ∈ M} w_m * BCE(classifier_m(z[:m]), y)
-```
-where M = {16, 32, 64, 128, 256, 512} and each `classifier_m` is an independent linear layer operating on the first `m` dimensions.
-
-### PTB-XL Dataset
-
-- **21,799** 12-lead ECGs, 10 seconds, 100/500 Hz
-- **5 superdiagnostic classes:** NORM, MI, STTC, CD, HYP
-- Official train/val/test splits (folds 1-8 / 9 / 10)
-- Primary metric: **macro-averaged AUC-ROC**
-
-## Training Tips
+A single ECG encoder is trained so that **every prefix of its
+512-dimensional embedding is independently usable**. Prefix length then
+acts as a transmission-rate knob: one artefact serves a 64-byte
+narrowband uplink and a 2-kilobyte clinical link with no retraining, no
+model swap and no revalidation.
 
 ```bash
-# Quick test run (2 epochs, smaller model)
-python scripts/train_day1.py --config configs/mrl_resnet1d.yaml \
-    --backbone xresnet1d50 --epochs 2 --batch-size 64
+git clone https://github.com/Abraheem13/Matryoshka-ECG_M1.git
+cd Matryoshka-ECG_M1
+pip install -r code/requirements.txt
 
-# Monitor training
-tensorboard --logdir results/logs
-
-# Resume from checkpoint (modify train script if needed)
-# Checkpoints auto-saved every 10 epochs + best model
+make verify                                           # Linux / macOS
+powershell -ExecutionPolicy Bypass -File verify.ps1   # Windows
 ```
 
-## GPU Memory Requirements
+No GPU, no dataset, no network, no LaTeX. About a minute.
 
-| Backbone     | Batch 64 | Batch 128 | Batch 256 |
-|-------------|----------|-----------|-----------|
-| xresnet1d50  | ~3 GB    | ~5 GB     | ~9 GB     |
-| xresnet1d101 | ~5 GB    | ~8 GB     | ~14 GB    |
-| inception1d  | ~2 GB    | ~3 GB     | ~5 GB     |
+---
 
-If GPU OOM: reduce batch_size or use `--backbone inception1d`.
+## What `make verify` checks
+
+Every number, table and figure-data file the article reports lives in
+[`paper/generated/`](paper/generated). None of it is written by hand:
+all of it is emitted by `code/scripts/aggregate_results.py` (measured
+results), `link_budget.py` (declared arithmetic) and
+`emit_config_table.py` (the configuration, read from the YAML).
+
+`make verify` runs the generator and fails if a single character of
+`paper/generated/` differs from what it produces. That is the guarantee
+this repository makes about itself: **every published number is
+generator output, and no measured result was typed by hand — including
+in this README, which quotes none.** (The dataset counts below are
+properties of the public corpus, recomputable by `dataset_stats.py`.)
+
+It also runs the statistics unit tests, which check the DeLong test, the
+paired bootstrap and the AUC implementation against `sklearn` and
+against their own invariants.
+
+**What it does not prove.** It does not re-run the experiments. The
+inputs it feeds the generator are the synthetic fixture in
+[`code/tests/fixtures/`](code/tests/fixtures/README.md), whose per-seed
+values are constructed to have the summary statistics the article
+reports. It therefore proves that the table-generating path is
+deterministic and matches what was published; it is not independent
+evidence for the measurements themselves. Only path C below is that.
+The fixture is labelled synthetic in its own README and must never be
+mixed with experimental output.
+
+## Reproduction paths
+
+| Path | Needs | Time | Reproduces |
+|---|---|---|---|
+| **A. Verify** | Python | ~1 min | that every published table, macro and figure-data file is the generator's output |
+| **B. From run outputs** | a `results/` directory | ~1 min | every table, macro and figure data file, exactly |
+| **C. From scratch** | PTB-XL, one GPU | ~45–55 GPU-h | the measurements themselves, within seed noise |
+
+```bash
+# A
+make verify
+
+# B  (place the run outputs at code/results/, then)
+make tables
+
+# C
+code/scripts/download_data.sh
+python code/scripts/preprocess_ptbxl.py --raw data/ptbxl_raw --out data/processed
+cd code && ./run_all.sh          # SEEDS="0" ./run_all.sh for a ~4 h single seed
+```
+
+`run_all.sh` is idempotent: a run whose `results.json` already exists is
+skipped, so an interrupted job resumes cleanly. Its stage 10 regenerates
+everything in `paper/generated/`.
+
+To check the corpus statistics without training anything, run
+`python code/scripts/dataset_stats.py --raw <dir with the two PTB-XL
+CSVs>`; it recomputes every dataset count from ~6.6 MB of public
+metadata.
+
+## Layout
+
+```
+code/
+  mecg/
+    data/dataset.py        normalisation modes, lead subsets, artefact injection
+    models/backbones.py    XResNet1D, Inception1D (+SE, configurable width)
+    models/heads.py        MRL, MRL-E, linear
+    losses.py              multi-granularity objective
+    analysis/stats.py      DeLong, paired bootstrap, TOST equivalence, Holm
+    analysis/probing.py    prefix/slab probes, CKA, effective rank
+    analysis/features.py   physiological descriptors (NeuroKit2)
+    analysis/metrics.py    AUC / F1 / AP with tuned thresholds
+  scripts/
+    preprocess_ptbxl.py    PTB-XL -> raw mV .npy + metadata
+    train.py               one training run
+    eval_transfer.py       svd | robustness | leads | external
+    run_probing.py         the representation-hierarchy test
+    benchmark_hardware.py  measured latency, energy and peak memory
+    quantize.py            fp16 / INT8, differential penalty
+    dataset_stats.py       corpus composition from PTB-XL metadata alone
+    link_budget.py         declared airtime and energy arithmetic
+    emit_config_table.py   configuration table, generated from the YAML
+    aggregate_results.py   results -> tables, macros and figure data
+    smoke_test.py          33 checks on synthetic signals, no PTB-XL needed
+  tests/                   unit tests, golden-file test, synthetic fixture
+  run_all.sh               the full experiment matrix, 10 stages
+paper/generated/           every published table, macro and figure data file
+```
+
+## Provenance
+
+Results flow one way:
+
+```
+experiments -> results/*.json -> aggregate_results.py -> paper/generated/*.{tex,dat} -> article
+```
+
+Measured and derived quantities are kept apart by construction.
+`link_budget.py` writes to `generated/linkbudget.tex` under an `LB` macro
+prefix, and the article labels that table as derived arithmetic over
+measured payload sizes. No link-budget number is presented as a network
+measurement.
+
+## What this code does and does not establish
+
+**Does:** that diagnostic information in twelve-lead ECG representations
+concentrates into a short prefix; that nesting reaches that accuracy at
+parity with training a separate model per rate; that inference latency is
+flat in prefix length; and that the trailing coordinates carry physiology
+the five-class task does not need.
+
+**Does not:** any network measurement, any execution on wearable or
+microcontroller hardware, or any evaluation on wearable-acquired data.
+
+## Relation to the earlier code in this repository
+
+This replaces the original contents, which accompanied an earlier version
+of the work. **Do not use the old code or its results.** Six defects were
+found in it, and the current results depend on all six being fixed.
+
+| Defect | Effect |
+|---|---|
+| Per-record z-scoring baked into the `.npy` files | destroyed absolute voltage, the diagnostic criterion for hypertrophy |
+| SVD basis *and* classifier fitted on the test split | leakage; the curve was then plotted against honestly evaluated models |
+| Weight decay grouped by `'bn' in name` | missed every BatchNorm nested inside `ConvBlock1d` |
+| F1 at a fixed 0.5 threshold | understates imbalanced multi-label F1 |
+| Model selection on the largest head | biased the checkpoint toward one operating point, which is the one thing a nested model must avoid |
+| SE attention described but absent from the code | description/implementation mismatch |
+
+Three further bugs surfaced only by *running* the code, the worst an
+`nn.ModuleDict` integer-versus-string key lookup that made every forward
+pass raise. That is the argument for running `smoke_test.py` before
+committing GPU hours.
+
+## Status
+
+- The experimental run outputs (`results/`) and trained checkpoints are
+  **not yet published here**. Until they are, path B cannot be run and
+  path A is the available check. They will be attached as a release.
+- No licence is attached yet, so default copyright applies; contact the
+  authors about reuse.
+
+## Data and citation
+
+PTB-XL v1.0.3 (PhysioNet, CC BY 4.0). Expect 21,799 records and 18,869
+patients; v1.0.1 and v1.0.2 differ. External corpora: CPSC-2018,
+Chapman–Shaoxing/Ningbo and Georgia from PhysioNet/CinC-2020.
+
+```bibtex
+@article{rashid2026nested,
+  author  = {Rashid, Abraheem and Iradat, Faisal and Iqbal, Waseem and
+             Bangash, Yawar Abbas and Kumail, Muhammad},
+  title   = {Nested Semantic Encoding for Bandwidth-Adaptive
+             Mission-Critical Biosignal Telemetry in {6G} Networks},
+  journal = {IEEE Open Journal of the Communications Society},
+  year    = {2026}
+}
+```
