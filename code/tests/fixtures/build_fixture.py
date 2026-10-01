@@ -139,7 +139,10 @@ def seeds_with(mu, sd, n, first=None):
 
 def write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+    # newline="\n" keeps the fixture byte-identical on every platform.
+    # Without it a run on Windows rewrites all 28 files with CRLF and
+    # leaves a clean checkout looking modified.
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(obj, f, indent=2)
 
 
@@ -265,7 +268,8 @@ def main():
     shutil.copy2(os.path.join(HERE, "dataset.json"),
                  os.path.join(out, "dataset.json"))
 
-    with open(os.path.join(out, "README.md"), "w", encoding="utf-8") as f:
+    with open(os.path.join(out, "README.md"), "w", encoding="utf-8",
+              newline="\n") as f:
         f.write("SYNTHETIC FIXTURE -- NOT EXPERIMENTAL DATA.\n\nBuilt by "
                 "build_fixture.py so that summary statistics equal the "
                 "manuscript's printed values. Used only by "
